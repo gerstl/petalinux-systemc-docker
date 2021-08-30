@@ -1,9 +1,12 @@
-# petalinux-docker
+# petalinux-systemc-docker
 
-Copy petalinux-v2020.2-final-installer.run file to this folder. Then run:
+Copy systemc-2.3.3.tar.gz file to this folder.
+Copy petalinux-v2020.2-final-installer.run file to this folder.
 
-`docker build --build-arg PETA_VERSION=2020.2 --build-arg PETA_RUN_FILE=petalinux-v2020.2-final-installer.run -t petalinux:2020.2 .`
+Then run:
 
-After installation, launch petalinux with:
+`docker build -t petalinux-systemc:2020.2 .`
 
-`docker run -ti --rm -e DISPLAY=$DISPLAY --net="host" -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/vivado/.Xauthority -v $HOME/Projects:/home/vivado/project  petalinux:2018.1 /bin/bash`
+After installation, launch a container with (including X forwarding):
+
+`docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/xilinx/.Xauthority petalinux-systemc:2020.2 /bin/bash`

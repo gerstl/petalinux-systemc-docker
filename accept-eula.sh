@@ -1,15 +1,11 @@
 #!/usr/bin/expect
 set timeout -1
+set platform [lindex $argv 2]
 set install_dir [lindex $argv 1]
 set installer [lindex $argv 0]
 
-spawn $installer $install_dir
-set timeout 2
-expect {
-    "ERROR: Invalid options:" {spawn $installer -d $install_dir }
-    timeout { }
-}
 
+spawn $installer -d $install_dir -p $platform
 set timeout 600
 expect "Press Enter to display the license agreements"
 send "\r"
