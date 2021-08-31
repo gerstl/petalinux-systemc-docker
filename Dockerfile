@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 MAINTAINER gerstl <gerstl@ece.utexas.edu>
 
+ARG INSTALL_ROOT=/opt
 ARG SYSTEMC_VERSION=2.3.3
 ARG SYSTEMC_ARCHIVE=systemc-2.3.3.tar.gz
 ARG PETA_VERSION=2020.2
@@ -78,7 +79,7 @@ RUN cd /home/xilinx && \
   tar xzf ${SYSTEMC_ARCHIVE} && \
   mkdir systemc-${SYSTEMC_VERSION}/objdir && \
   cd systemc-${SYSTEMC_VERSION}/objdir && \
-  ../configure --prefix=/opt/systemc-${SYSTEMC_VERSION} && \
+  ../configure --prefix=${INSTALL_ROOT}/systemc-${SYSTEMC_VERSION} && \
   make && \
   make install && \
   cd /home/xilinx && \
@@ -89,14 +90,11 @@ RUN cd /home/xilinx && \
 COPY accept-eula.sh ${PETA_RUN_FILE} /home/xilinx/
 RUN chmod a+rx /home/xilinx/${PETA_RUN_FILE} && \
   chmod a+rx /home/xilinx/accept-eula.sh && \
-  mkdir -p /opt/xilinx && \
-  chmod 777 /tmp /opt/xilinx && \
+  mkdir -p ${INSTALL_ROOT}/xilinx && \
+  chmod 777 /tmp ${INSTALL_ROOT}/xilinx && \
   cd /tmp && \
-  sudo -u xilinx -i /home/xilinx/accept-eula.sh /home/xilinx/${PETA_RUN_FILE} /opt/xilinx/petalinux aarch64 && \
+  sudo -u xilinx -i /home/xilinx/accept-eula.sh /home/xilinx/${PETA_RUN_FILE} ${INSTALL_ROOT}/xilinx/petalinux aarch64 && \
   rm -f /home/xilinx/${PETA_RUN_FILE} /home/xilinx/accept-eula.sh
-
-# make symlink to /usr/local/packages
-RUN ln -s /opt /usr/local/packages
 
 # make /bin/sh symlink to bash instead of dash:
 RUN echo "dash dash/sh boolean false" | debconf-set-selections
@@ -108,18 +106,19 @@ ENV LANG en_US.UTF-8
 WORKDIR /home/xilinx
 
 # add vivado tools to path
-RUN echo "source /opt/xilinx/petalinux/settings.sh" >> /home/xilinx/.bashrc
+RUN echo "source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh" >> /home/xilinx/.bashrc
 
 # clone the Xilinx SystemC co-simulation demo
 RUN cd /home/xilinx && \
-  git clone https://github.com/Xilinx/systemctlm-cosim-demo.git && \
+  git clone --depth 1 https://github.com/Xilinx/systemctlm-cosim-demo.git && \
   cd systemctlm-cosim-demo && \
   git submodule update --init libsystemctlm-soc && \
-  sed -i -e 's|/usr/local/systemc-2.3.2|/usr/local/packages/systemc-'${SYSTEMC_VERSION}'|g' Makefile && \
-  make
+  sed -i -e 's|/usr/local/systemc-2.3.2|'${INSTALL_ROOT}'/systemc-'${SYSTEMC_VERSION}'|g' Makefile && \
+  make && \
+  make TARGETS= clean
 
 # clone the device trees for co-simulation
 RUN cd /home/xilinx && \
-  git clone https://github.com/Xilinx/qemu-devicetrees && \
+  git clone --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
   cd qemu-devicetrees && \
   make

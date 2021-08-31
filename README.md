@@ -9,4 +9,4 @@ Then run:
 
 After installation, launch a container with (including X forwarding):
 
-`docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/xilinx/.Xauthority petalinux-systemc:2020.2 /bin/bash`
+`docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/xilinx/.Xauthority petalinux-systemc:2020.2`
