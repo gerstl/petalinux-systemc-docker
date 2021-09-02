@@ -50,12 +50,12 @@ RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   libtool \
   libtool-bin \
   locales \
-  kmod \
   git \
   rsync \
   bc \
   u-boot-tools \
   python \
+  xxd \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -91,10 +91,10 @@ COPY accept-eula.sh ${PETA_RUN_FILE} /home/xilinx/
 RUN chmod a+rx /home/xilinx/${PETA_RUN_FILE} && \
   chmod a+rx /home/xilinx/accept-eula.sh && \
   mkdir -p ${INSTALL_ROOT}/xilinx && \
-  chmod 777 /tmp ${INSTALL_ROOT}/xilinx && \
+  chown xilinx.xilinx ${INSTALL_ROOT}/xilinx && \
   cd /tmp && \
   sudo -u xilinx -i /home/xilinx/accept-eula.sh /home/xilinx/${PETA_RUN_FILE} ${INSTALL_ROOT}/xilinx/petalinux aarch64 && \
-  rm -f /home/xilinx/${PETA_RUN_FILE} /home/xilinx/accept-eula.sh
+  rm -f /home/xilinx/${PETA_RUN_FILE} /home/xilinx/accept-eula.sh /home/xilinx/petalinux_installation_log
 
 # make /bin/sh symlink to bash instead of dash:
 RUN echo "dash dash/sh boolean false" | debconf-set-selections
@@ -119,6 +119,6 @@ RUN cd /home/xilinx && \
 
 # clone the device trees for co-simulation
 RUN cd /home/xilinx && \
-  git clone --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
+  git clone -b xilinx-v${PETA_VERSION} --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
   cd qemu-devicetrees && \
   make
