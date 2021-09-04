@@ -106,8 +106,10 @@ ENV HOME /home/xilinx
 ENV LANG en_US.UTF-8
 WORKDIR /home/xilinx
 
-# add vivado tools to path
-RUN echo "source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh" >> /home/xilinx/.bashrc
+# add Petalinux tools and SystemC to path
+RUN echo "" >> /home/xilinx/.bashrc && \
+    echo "export LD_LIBRARY_PATH=${INSTALL_ROOT}/systemc-${SYSTEMC_VERSION}/lib-linux64" >> /home/xilinx/.bashrc && \
+    echo "source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh" >> /home/xilinx/.bashrc
 
 # clone the Xilinx SystemC co-simulation demo
 RUN cd /home/xilinx && \
