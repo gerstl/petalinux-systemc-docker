@@ -5,7 +5,7 @@ set install_dir [lindex $argv 1]
 set installer [lindex $argv 0]
 set basedir [file dirname $installer]
 
-if ("$platform" != "") {
+if {$platform != ""} {
     spawn $installer -d $install_dir -p "$platform"
 } else {
     spawn $installer -d $install_dir

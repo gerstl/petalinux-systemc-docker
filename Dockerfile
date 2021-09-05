@@ -1,7 +1,9 @@
-FROM ubuntu:18.04
+ARG UBUNTU_VERSION=18.04
+FROM ubuntu:${UBUNTU_VERSION}
 
 MAINTAINER gerstl <gerstl@ece.utexas.edu>
 
+ARG UBUNTU_VERSION
 ARG INSTALL_ROOT=/opt
 ARG SYSTEMC_VERSION=2.3.3
 ARG SYSTEMC_ARCHIVE=systemc-2.3.3.tar.gz
@@ -11,8 +13,7 @@ ARG PETA_PLATFORM=
 
 # build with "docker build --build-arg PETA_VERSION=2020.2 -t petalinux:2020.2 ."
 
-# install dependences:
-
+# install dependencies:
 RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   build-essential \
   sudo \
@@ -57,7 +58,12 @@ RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   bc \
   u-boot-tools \
   python \
-  xxd \
+  `case ${UBUNTU_VERSION} in    \
+    18*) echo xxd               \
+         ;;                     \
+    20*) echo libtinfo5 xxd     \
+         ;;                     \
+   esac` \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -123,7 +129,7 @@ RUN cd /home/xilinx && \
   make TARGETS= clean
 
 # clone the device trees for co-simulation
-RUN cd /home/xilinx && \
+RUN cd /home/xilinx && source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh && \
   git clone -b xilinx-v${PETA_VERSION} --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
   cd qemu-devicetrees && \
   make
