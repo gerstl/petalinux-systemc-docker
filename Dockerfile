@@ -6,9 +6,10 @@ ARG INSTALL_ROOT=/opt
 ARG SYSTEMC_VERSION=2.3.3
 ARG SYSTEMC_ARCHIVE=systemc-2.3.3.tar.gz
 ARG PETA_VERSION=2020.2
-ARG PETA_RUN_FILE=petalinux-v2020.2-final-installer.run
+ARG PETA_RUN_FILE=petalinux-v${PETA_VERSION}-final-installer.run
+ARG PETA_PLATFORM=
 
-# build with "docker build --build-arg PETA_VERSION=2020.2 --build-arg PETA_RUN_FILE=petalinux-v2020.2-final-installer.run -t petalinux:2020.2 ."
+# build with "docker build --build-arg PETA_VERSION=2020.2 -t petalinux:2020.2 ."
 
 # install dependences:
 
@@ -66,8 +67,11 @@ RUN dpkg --add-architecture i386 &&  apt-get update &&  \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-
 RUN locale-gen en_US.UTF-8 && update-locale
+
+# make /bin/sh symlink to bash instead of dash:
+RUN echo "dash dash/sh boolean false" | debconf-set-selections
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # make a xilinx user
 RUN adduser --disabled-password --gecos '' xilinx && \
@@ -88,18 +92,16 @@ RUN cd /home/xilinx && \
   rm -rf systemc-${SYSTEMC_VERSION}
 
 # run the petalinux install
-COPY accept-eula.sh ${PETA_RUN_FILE} /home/xilinx/
+COPY sed.sh accept-eula.sh ${PETA_RUN_FILE} /home/xilinx/
 RUN chmod a+rx /home/xilinx/${PETA_RUN_FILE} && \
   chmod a+rx /home/xilinx/accept-eula.sh && \
+  chmod a+rx /home/xilinx/sed.sh && \
+  mv /home/xilinx/sed.sh /home/xilinx/sed && \
   mkdir -p ${INSTALL_ROOT}/xilinx && \
   chown xilinx.xilinx ${INSTALL_ROOT}/xilinx && \
   cd /tmp && \
-  sudo -u xilinx -i /home/xilinx/accept-eula.sh /home/xilinx/${PETA_RUN_FILE} ${INSTALL_ROOT}/xilinx/petalinux aarch64 && \
-  rm -f /home/xilinx/${PETA_RUN_FILE} /home/xilinx/accept-eula.sh /home/xilinx/petalinux_installation_log
-
-# make /bin/sh symlink to bash instead of dash:
-RUN echo "dash dash/sh boolean false" | debconf-set-selections
-RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+  sudo -u xilinx -i /home/xilinx/accept-eula.sh /home/xilinx/${PETA_RUN_FILE} ${INSTALL_ROOT}/xilinx/petalinux "${PETA_PLATFORM}" && \
+  rm -f /home/xilinx/${PETA_RUN_FILE} /home/xilinx/accept-eula.sh /home/xilinx/sed /home/xilinx/petalinux_installation_log
 
 USER xilinx
 ENV HOME /home/xilinx

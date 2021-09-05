@@ -3,9 +3,21 @@ set timeout -1
 set platform [lindex $argv 2]
 set install_dir [lindex $argv 1]
 set installer [lindex $argv 0]
+set basedir [file dirname $installer]
 
+if ("$platform" != "") {
+    spawn $installer -d $install_dir -p "$platform"
+} else {
+    spawn $installer -d $install_dir
+}
+set timeout 2
+expect {
+    "getopt: invalid option" {
+        spawn env PATH=$basedir:$env(PATH) $installer $install_dir
+    }
+    timeout { }
+}
 
-spawn $installer -d $install_dir -p $platform
 set timeout 600
 expect "Press Enter to display the license agreements"
 send "\r"
