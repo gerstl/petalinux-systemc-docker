@@ -58,6 +58,7 @@ RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   bc \
   u-boot-tools \
   python \
+  vim-tiny \
   `case ${UBUNTU_VERSION} in    \
     18*) echo xxd               \
          ;;                     \
