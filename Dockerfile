@@ -129,8 +129,9 @@ RUN cd /home/xilinx && \
   make && \
   make TARGETS= clean
 
-# clone the device trees for co-simulation
-RUN cd /home/xilinx && source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh && \
-  git clone -b xilinx-v${PETA_VERSION} --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
-  cd qemu-devicetrees && \
-  make
+# Optional: clone the device trees for co-simulation
+#RUN cd /home/xilinx && \
+#  source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh && \
+#  git clone -b xilinx-v${PETA_VERSION} --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
+#  cd qemu-devicetrees && \
+#  make
