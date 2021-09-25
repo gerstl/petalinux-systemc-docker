@@ -11,7 +11,7 @@ ARG PETA_VERSION=2020.2
 ARG PETA_RUN_FILE=petalinux-v${PETA_VERSION}-final-installer.run
 ARG PETA_PLATFORM=
 
-# build with "docker build --build-arg PETA_VERSION=2020.2 -t petalinux:2020.2 ."
+# build with "docker build --build-arg PETA_VERSION=2020.2 -t petalinux-systemc:2020.2 ."
 
 # install dependencies:
 RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
