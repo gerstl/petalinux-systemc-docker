@@ -1,9 +1,8 @@
 # petalinux-systemc-docker
 
-Copy systemc-2.3.3.tar.gz file to this folder.
-Copy petalinux-v2020.2-final-installer.run file to this folder.
+Forked from https://github.com/z4yx/petalinux-docker, and with additional input from https://github.com/Sparkles-Qemu/qemu_vp_builder
 
-Then run:
+To build the image, copy systemc-2.3.3.tar.gz and petalinux-v2020.2-final-installer.run files to this folder. Then run:
 
 `docker build -t petalinux-systemc:2020.2 .`
 
