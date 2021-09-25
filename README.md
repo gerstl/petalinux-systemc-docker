@@ -45,11 +45,11 @@ First, create a temporary directory used to exchange information between QEMU an
 
       mkdir ../tmp
 
-Launch a QEMU co-simulation instance insider the container with:
+Launch a QEMU instance insider the container using a custom co-simulation device tree and pointing it to the temporary directory with:
 
-      petalinux-boot --qemu --kernel --qemu-args "-machine-path ../tmp -sync-quantum <quantum>"
+      petalinux-boot --qemu --kernel --qemu-args "-hw-dtb ../qemu-devicetrees/LATEST/MULTI_ARCH/zcu102-arm.cosim.dtb -machine-path ../tmp -sync-quantum <quantum>"
 
-The simulation <quantum> should normally be 1000000.
+The simulation `<quantum>` is optional and should normally be 1000000.
 
 Then switch to another host terminal, and launch a second shell in your container:
 
