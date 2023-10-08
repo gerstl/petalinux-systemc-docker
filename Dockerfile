@@ -4,6 +4,7 @@ FROM ubuntu:${UBUNTU_VERSION}
 MAINTAINER gerstl <gerstl@ece.utexas.edu>
 
 ARG UBUNTU_VERSION
+ARG UBUNTU_MIRROR
 ARG INSTALL_ROOT=/opt
 ARG SYSTEMC_VERSION=2.3.4
 ARG SYSTEMC_ARCHIVE=systemc-2.3.4.tar.gz
@@ -15,6 +16,7 @@ ARG PETA_PLATFORM=
 # build with "docker build --build-arg PETA_RELEASE=<release> -t petalinux-systemc:2022.2 ."
 
 # install dependencies:
+RUN [ -z "${UBUNTU_MIRROR}" ] || sed -i.bak s/archive.ubuntu.com/${UBUNTU_MIRROR}/g /etc/apt/sources.list
 RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   build-essential \
   sudo \
@@ -34,10 +36,13 @@ RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
   wget \
   socat \
   gcc-multilib \
+  libidn11 \
   libsdl1.2-dev \
   libglib2.0-dev \
   lib32z1-dev \
   libgtk2.0-0 \
+  libtinfo5 \
+  xxd \
   screen \
   pax \
   diffstat \
