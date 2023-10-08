@@ -2,28 +2,28 @@
 
 Forked from https://github.com/z4yx/petalinux-docker, and with additional input from https://github.com/Sparkles-Qemu/qemu_vp_builder
 
-To build the image, copy systemc-2.3.3.tar.gz and petalinux-v2020.2-final-installer.run files to this folder. Then run:
+To build the image, copy systemc-2.3.4.tar.gz and petalinux-v2022.2-<release>-installer.run files to this folder. Then run:
 
-`docker build -t petalinux-systemc:2020.2 .`
+`docker build --build-arg PETA_RELEASE=<release> -t petalinux-systemc:2022.2 .`
 
 After installation, launch a container with (including X forwarding):
 
-`docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/xilinx/.Xauthority petalinux-systemc:2020.2`
+`docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/xilinx/.Xauthority petalinux-systemc:2022.2`
 
 # Building a PetaLinux project
 
 First, either bind mount a board support package (BSP):
 
-`docker run -ti -v <bsp_root>/xilinx-zcu102-v2020.2-final.bsp:/home/xilinx/xilinx-zcu102-v2020.2-final.bsp qemu-systemc:2020.2`
+`docker run -ti -v <bsp_root>/xilinx-zcu102-v2022.2-final.bsp:/home/xilinx/xilinx-zcu102-v2022.2-final.bsp qemu-systemc:2022.2`
 
 or copy the BSP into the (existing) container:
 
-`docker cp <bsp_root>/xilinx-zcu102-v2020.2-final.bsp <container>:/home/xilinx/`
+`docker cp <bsp_root>/xilinx-zcu102-v2022.2-final.bsp <container>:/home/xilinx/`
 
 Then, inside the container, setup permissions, and create and build a new PetaLinux project:
 
-      sudo chown xilinx.xilinx xilinx-zcu102-v2020.2-final.bsp
-      petalinux-create -t project -n PetaLinux -s xilinx-zcu102-v2020.2-final.bsp
+      sudo chown xilinx.xilinx xilinx-zcu102-v2022.2-final.bsp
+      petalinux-create -t project -n PetaLinux -s xilinx-zcu102-v2022.2-final.bsp
       cd PetaLinux
       petalinux-config
       petalinux-build

@@ -5,13 +5,14 @@ MAINTAINER gerstl <gerstl@ece.utexas.edu>
 
 ARG UBUNTU_VERSION
 ARG INSTALL_ROOT=/opt
-ARG SYSTEMC_VERSION=2.3.3
-ARG SYSTEMC_ARCHIVE=systemc-2.3.3.tar.gz
-ARG PETA_VERSION=2020.2
-ARG PETA_RUN_FILE=petalinux-v${PETA_VERSION}-final-installer.run
+ARG SYSTEMC_VERSION=2.3.4
+ARG SYSTEMC_ARCHIVE=systemc-2.3.4.tar.gz
+ARG PETA_VERSION=2022.2
+ARG PETA_RELEASE=10141622
+ARG PETA_RUN_FILE=petalinux-v${PETA_VERSION}-${PETA_RELEASE}-installer.run
 ARG PETA_PLATFORM=
 
-# build with "docker build --build-arg PETA_VERSION=2020.2 -t petalinux-systemc:2020.2 ."
+# build with "docker build --build-arg PETA_RELEASE=<release> -t petalinux-systemc:2022.2 ."
 
 # install dependencies:
 RUN apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
@@ -86,11 +87,14 @@ RUN adduser --disabled-password --gecos '' xilinx && \
   echo "xilinx ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # run the SystemC install
+# NOTE: 2.3.4 version requires automake to create missing Makefiles
 COPY ${SYSTEMC_ARCHIVE} /home/xilinx/
 RUN cd /home/xilinx && \
   tar xzf ${SYSTEMC_ARCHIVE} && \
-  mkdir systemc-${SYSTEMC_VERSION}/objdir && \
-  cd systemc-${SYSTEMC_VERSION}/objdir && \
+  cd systemc-${SYSTEMC_VERSION} && \
+  aclocal && automake --add-missing && automake && \
+  mkdir objdir && \
+  cd objdir && \
   ../configure --prefix=${INSTALL_ROOT}/systemc-${SYSTEMC_VERSION} && \
   make && \
   make install && \
@@ -121,17 +125,20 @@ RUN echo "" >> /home/xilinx/.bashrc && \
     echo "source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh" >> /home/xilinx/.bashrc
 
 # clone the Xilinx SystemC co-simulation demo
+# NOTE: disable Versal demos (and library modules), they need newest g++
 RUN cd /home/xilinx && \
   git clone --depth 1 https://github.com/Xilinx/systemctlm-cosim-demo.git && \
   cd systemctlm-cosim-demo && \
   git submodule update --init libsystemctlm-soc && \
   sed -i -e 's|/usr/local/systemc-2.3.2|'${INSTALL_ROOT}'/systemc-'${SYSTEMC_VERSION}'|g' Makefile && \
-  make && \
+  sed -i -e 's|\(^SC_OBJS += .*/mcdma.o\)|#\1|g' Makefile && \
+  sed -i -e 's|\(^SC_OBJS += .*/mrmac.o\)|#\1|g' Makefile && \
+  make zynq_demo zynqmp_demo && \
   make TARGETS= clean
 
 # clone the device trees for co-simulation
 RUN cd /home/xilinx && \
   source ${INSTALL_ROOT}/xilinx/petalinux/settings.sh && \
-  git clone -b xilinx-v${PETA_VERSION} --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
+  git clone -b xlnx_rel_v${PETA_VERSION} --depth 1 https://github.com/Xilinx/qemu-devicetrees && \
   cd qemu-devicetrees && \
   make

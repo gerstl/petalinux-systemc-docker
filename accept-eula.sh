@@ -31,7 +31,9 @@ expect {
     "* >*" {send "y\r"}
     timeout { send "q"; sleep 1; exp_continue}
 }
+
 expect {
+    "*Installing PetaLinux...*" {}
     "* >*" {send "y\r"}
     timeout { send "q"; sleep 1; exp_continue}
 }
