@@ -14,16 +14,16 @@ After installation, launch a container with (including X forwarding):
 
 First, either bind mount a board support package (BSP):
 
-`docker run -ti -v <bsp_root>/xilinx-zcu102-v2022.2-final.bsp:/home/xilinx/xilinx-zcu102-v2022.2-final.bsp qemu-systemc:2022.2`
+`docker run -ti -v <bsp_root>/xilinx-zcu102-v2022.2-<release>.bsp:/home/xilinx/xilinx-zcu102-v2022.2-<release>.bsp qemu-systemc:2022.2`
 
 or copy the BSP into the (existing) container:
 
-`docker cp <bsp_root>/xilinx-zcu102-v2022.2-final.bsp <container>:/home/xilinx/`
+`docker cp <bsp_root>/xilinx-zcu102-v2022.2-<release>.bsp <container>:/home/xilinx/`
 
 Then, inside the container, setup permissions, and create and build a new PetaLinux project:
 
-      sudo chown xilinx.xilinx xilinx-zcu102-v2022.2-final.bsp
-      petalinux-create -t project -n PetaLinux -s xilinx-zcu102-v2022.2-final.bsp
+      sudo chown xilinx.xilinx xilinx-zcu102-v2022.2-<release>.bsp
+      petalinux-create -t project -n PetaLinux -s xilinx-zcu102-v2022.2-<release>.bsp
       cd PetaLinux
       petalinux-config
       petalinux-build
